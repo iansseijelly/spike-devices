@@ -10,9 +10,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h> // for sockaddr_in
 #include <netdb.h> // for gethostbyname 
+#include <unistd.h> // for close
 
 #define ROSE_BUF_SIZE      1024
 #define ROSE_WORD_SIZE     4
+
+#define ROSE_INT_ID        3
+#define ROSE_SIZE          0x1000
 
 #define ROSE_BASE_ADDR     (0x2000)
 #define ROSE_STATUS_ADDR   (0x00)
@@ -28,6 +32,12 @@ public:
     this->intctrl = intctrl;
     this->interrupt_id = int_id;
     setup_socket();
+  }
+
+  ~rose_arb_t() {
+    if (sync_sockfd >= 0) {
+      close(sync_sockfd);
+    }
   }
 
   bool load(reg_t addr, size_t len, uint8_t* bytes) override;
